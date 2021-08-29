@@ -4,6 +4,6 @@ Search images easily as per your need.
 
 ### TODOS:
 
-- add pagination
+- add pagination &#9745;
 - add user login
 - add favorites functionality for users
