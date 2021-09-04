@@ -1,4 +1,5 @@
 import React from "react";
+import {Tag} from 'antd';
 
 export default function ImageCard({ image }) {
 	const tags = image.tags.split(",");
@@ -28,12 +29,7 @@ export default function ImageCard({ image }) {
 
 				<div className="px-4 py-6">
 					{tags.map((tag, i) => (
-						<span
-							key={i}
-							className="inline-block bg-primary-light text-sm text-gray-700 rounded-full px-2 py-1 mr-2 mt-2 font-semibold"
-						>
-							#{tag}
-						</span>
+						<Tag key={i} color="blue">#{tag}</Tag>
 					))}
 				</div>
 			</div>

@@ -1,53 +1,18 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useContext } from "react";
 import { Alert } from "antd";
 
 import SearchForm from "./components/search-form.js";
 import Loading from "./components/loading.js";
 import Images from "./components/images.js";
 import PaginationSection from "./components/pagination.js";
+import { AppContext } from "./store/app-context-provider";
 
 function App() {
-  const [images, setImages] = useState([]);
-  const [pageNum, setPageNum] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [isLoading, setIsLoading] = useState(true);
-  const [err, setErr] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const URL = "https://pixabay.com/api/";
-      const params = {
-        key: process.env.REACT_APP_PIXABAY_API_KEY,
-        page: pageNum,
-        per_page: itemsPerPage,
-        image_type: "photo",
-        safesearch: true,
-        q: searchQuery,
-      };
-
-      try {
-        setIsLoading(true);
-
-        const res = await axios.get(URL, { params });
-        const data = res.data;
-        setImages(data.hits);
-
-        setIsLoading(false);
-      } catch (e) {
-        console.log(e);
-        setIsLoading(false);
-        setErr(true);
-      }
-    };
-
-    fetchData();
-  }, [searchQuery, pageNum, itemsPerPage]);
+  const appCtx = useContext(AppContext);
 
   function search(term) {
     const t = term.trim();
-    setSearchQuery(t);
+    appCtx.setSearchQuery(t);
   }
 
   return (
@@ -55,23 +20,27 @@ function App() {
       <SearchForm search={search} />
 
       {/*No Images Found*/}
-      {isLoading === false && images.length === 0 && !err && (
-        <p className="text-3xl font-semibold text-gray-800">No Images Found!</p>
-      )}
+      {appCtx.isLoading === false &&
+        appCtx.data.length === 0 &&
+        !appCtx.err && (
+          <p className="text-3xl font-semibold text-gray-800">
+            No Images Found!
+          </p>
+        )}
 
       {/*Loading*/}
-      {isLoading ? (
+      {appCtx.isLoading ? (
         <Loading size="large" />
       ) : (
-        !err && (
+        !appCtx.err && (
           <>
-            <Images images={images} />
+            <Images />
 
             <PaginationSection
-              pageNum={pageNum}
-              itemsPerPage={itemsPerPage}
-              setPageNum={setPageNum}
-              setItemsPerPage={setItemsPerPage}
+              pageNum={appCtx.pageNum}
+              itemsPerPage={appCtx.itemsPerPage}
+              setPageNum={appCtx.setPageNum}
+              setItemsPerPage={appCtx.setItemsPerPage}
             />
           </>
         )
@@ -79,7 +48,9 @@ function App() {
 
       {/*error*/}
       <div className="absolute bottom-4 w-2/3">
-        {err && <Alert type="error" message="Something went wrong!" banner />}
+        {appCtx.err && (
+          <Alert type="error" message="Something went wrong!" banner />
+        )}
       </div>
     </div>
   );
